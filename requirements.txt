@@ -1,5 +1,1 @@
 streamlit
-pandas
-openpyxl
-pdfplumber
-rapidfuzz
