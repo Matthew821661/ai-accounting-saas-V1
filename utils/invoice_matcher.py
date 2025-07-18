@@ -6,7 +6,8 @@ def extract_invoice_data_from_pdf(pdf_file_path):
     with pdfplumber.open(pdf_file_path) as pdf:
         text = ""
         for page in pdf.pages:
-            text += page.extract_text() + "\n"
+            page_text = page.extract_text() or ""
+            text += page_text + "\n"
 
     amount_match = re.search(r"(Total|Amount Due)\s*[:\-]?\s*R?(\d+[\.,]?\d+)", text, re.IGNORECASE)
     date_match = re.search(r"(Date|Invoice Date)\s*[:\-]?\s*(\d{2,4}[/-]\d{1,2}[/-]\d{2,4})", text)
