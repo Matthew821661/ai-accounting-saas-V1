@@ -21,6 +21,25 @@ This project is a small prototype of a bookkeeping application built with [Strea
    ```
    The `requirements.txt` file includes `pytest` so you can run the test suite.
 
+## Setup
+
+The app expects no special environment variables by default. If you wish to
+customize things like the Streamlit port or enable additional PDF/Excel
+functionality you can create a `.env` file and set environment variables before
+running the app.
+
+## Deployment
+
+You can deploy the prototype using Docker. Build the image from the repository
+root and then run a container exposing port `8501`:
+
+```bash
+docker build -t ai-accounting-saas .
+docker run -p 8501:8501 ai-accounting-saas
+```
+
+Visit `http://localhost:8501` in your browser to access the app.
+
 ## Usage
 
 Run the Streamlit app from the repository root (requires `streamlit`):
@@ -48,4 +67,10 @@ utils/              # Helper functions for matching and accounting
 ```
 
 This is an experimental prototype and not production-ready. Contributions are welcome!
+
+## Security Notes
+
+Authentication in this project is only a placeholder and **should not** be used
+to protect sensitive data. There is no encryption or database layer, so run the
+application in a trusted environment only.
 
