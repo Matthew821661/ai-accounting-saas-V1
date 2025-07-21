@@ -7,7 +7,7 @@ from components.invoice_matcher_ui import run_invoice_matcher
 from utils.ledger import generate_ledger
 from utils.trial_balance import generate_trial_balance
 from utils.export import export_trial_balance, export_general_ledger
-from utils.pdf_utils import parse_bank_statement_pdf
+from utils.pdf_utils import parse_bank_statement_pdf, parse_bank_statement_csv
 
 def launch_dashboard(session):
     """Main dashboard screen shown after login."""
@@ -28,11 +28,12 @@ def launch_dashboard(session):
                 os.unlink(tmp_path)
             else:
                 content = bank_file.getvalue().decode("utf-8", errors="ignore")
-                reader = csv.DictReader(io.StringIO(content))
-                bank_rows = list(reader)
+                bank_rows = parse_bank_statement_csv(content)
             st.write("Transactions")
             st.table(bank_rows)
-        except Exception as exc:
+        except ValueError as exc:
+            st.error(str(exc))
+        except Exception as exc:  # pragma: no cover - unexpected I/O errors
             st.error(f"Failed to read bank statement: {exc}")
 
     run_invoice_matcher(bank_rows)
