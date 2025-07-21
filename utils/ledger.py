@@ -1,5 +1,12 @@
+from .classifier import classify_transaction
+
+
 def generate_ledger(bank_rows):
-    """Create a rudimentary general ledger from a bank statement."""
+    """Create a rudimentary general ledger from a bank statement.
+
+    The GL account for each transaction is determined using a simple
+    classifier which acts as a lightweight stand-in for an AI model.
+    """
 
     if not bank_rows:
         return bank_rows
@@ -7,9 +14,7 @@ def generate_ledger(bank_rows):
     ledger = []
     for row in bank_rows:
         entry = row.copy()
-        entry["GL Account"] = (
-            "6100/000 - Expense" if "MTN" in str(row.get("Description", "")).upper() else "1000/000 - Cash"
-        )
+        entry["GL Account"] = classify_transaction(row.get("Description", ""))
         try:
             amount = float(str(row.get("Amount", 0)).replace(",", ""))
         except ValueError:

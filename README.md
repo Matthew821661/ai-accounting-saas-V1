@@ -4,10 +4,11 @@ This project is a small prototype of a bookkeeping application built with [Strea
 
 ## Features
 
-- Upload bank statements in CSV format
+- Upload bank statements in CSV **or PDF** format (basic OCR support)
 - Parse invoice PDFs and match them to transactions
+- Classify transactions into GL accounts using a lightweight classifier
 - Generate a simple general ledger and trial balance
-- Download the trial balance as CSV
+- Download the trial balance and general ledger as CSV, with optional PDF/Excel export if dependencies are installed
 
 ## Installation
 
@@ -15,8 +16,8 @@ This project is a small prototype of a bookkeeping application built with [Strea
 2. Install the project dependencies:
    ```bash
    pip install -r requirements.txt
-   # Optional: install PyPDF2 for better invoice parsing
-   pip install PyPDF2
+   # Optional: install extra libraries for better PDF parsing and exports
+   pip install PyPDF2 pdf2image pytesseract pandas fpdf
    ```
    The `requirements.txt` file includes `pytest` so you can run the test suite.
 
