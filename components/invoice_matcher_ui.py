@@ -1,3 +1,4 @@
+import os
 import tempfile
 import streamlit as st
 
@@ -12,11 +13,17 @@ def run_invoice_matcher(bank_rows):
     if uploaded_invoice and bank_rows:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             tmp.write(uploaded_invoice.read())
+            tmp_path = tmp.name
+        try:
+            invoice_data = extract_invoice_data_from_pdf(tmp_path)
+        except Exception as exc:
+            st.error(f"Failed to process invoice: {exc}")
+            return
+        finally:
             try:
-                invoice_data = extract_invoice_data_from_pdf(tmp.name)
-            except Exception as exc:
-                st.error(f"Failed to process invoice: {exc}")
-                return
+                os.unlink(tmp_path)
+            except OSError:
+                pass
         st.write("Extracted Invoice Data", invoice_data)
 
         score, matched_row = match_invoice_to_bank(invoice_data, bank_rows)

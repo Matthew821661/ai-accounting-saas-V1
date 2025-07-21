@@ -8,6 +8,12 @@ text and the fuzzy matching uses :mod:`difflib`.
 import re
 from difflib import SequenceMatcher
 
+try:  # optional dependency for better PDF parsing
+    from PyPDF2 import PdfReader
+    _HAS_PYPDF = True
+except Exception:  # pragma: no cover - optional dependency
+    _HAS_PYPDF = False
+
 def extract_invoice_data_from_pdf(pdf_file_path):
     """Parse a PDF invoice and return basic invoice data.
 
@@ -24,8 +30,16 @@ def extract_invoice_data_from_pdf(pdf_file_path):
     """
 
     try:
-        with open(pdf_file_path, "rb") as fh:
-            text = fh.read().decode("latin1", errors="ignore")
+        if _HAS_PYPDF:
+            reader = PdfReader(pdf_file_path)
+            text = "\n".join(page.extract_text() or "" for page in reader.pages)
+        else:
+            with open(pdf_file_path, "rb") as fh:
+                data = fh.read()
+            try:
+                text = data.decode("utf-8")
+            except UnicodeDecodeError:
+                text = data.decode("latin1", errors="ignore")
     except Exception as exc:  # pragma: no cover - I/O failures
         raise ValueError(f"Failed to read PDF '{pdf_file_path}': {exc}") from exc
 
@@ -35,12 +49,12 @@ def extract_invoice_data_from_pdf(pdf_file_path):
     date_match = re.search(
         r"(Date|Invoice Date)\s*[:\-]?\s*(\d{2,4}[/-]\d{1,2}[/-]\d{2,4})", text
     )
-    supplier_match = re.search(r"(From|Supplier)\s*[:\-]?\s*(.*)", text)
+    supplier_match = re.search(r"(?:From|Supplier)\s*[:\-]?\s*(\S[^\n]*)", text)
 
     return {
         "amount": float(amount_match.group(2).replace(",", "")) if amount_match else None,
         "date": date_match.group(2) if date_match else None,
-        "supplier": supplier_match.group(2).strip() if supplier_match else "Unknown",
+        "supplier": supplier_match.group(1).strip() if supplier_match else "Unknown",
     }
 
 def match_invoice_to_bank(invoice_data, bank_rows):

@@ -15,7 +15,10 @@ This project is a small prototype of a bookkeeping application built with [Strea
 2. Install the project dependencies:
    ```bash
    pip install -r requirements.txt
+   # Optional: install PyPDF2 for better invoice parsing
+   pip install PyPDF2
    ```
+   The `requirements.txt` file includes `pytest` so you can run the test suite.
 
 ## Usage
 

@@ -10,7 +10,10 @@ def generate_ledger(bank_rows):
         entry["GL Account"] = (
             "6100/000 - Expense" if "MTN" in str(row.get("Description", "")).upper() else "1000/000 - Cash"
         )
-        amount = float(row.get("Amount", 0))
+        try:
+            amount = float(str(row.get("Amount", 0)).replace(",", ""))
+        except ValueError:
+            amount = 0
         entry["Debit"] = amount if amount > 0 else 0
         entry["Credit"] = -amount if amount < 0 else 0
         ledger.append(entry)
