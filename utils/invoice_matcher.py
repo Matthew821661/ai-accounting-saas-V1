@@ -8,11 +8,7 @@ text and the fuzzy matching uses :mod:`difflib`.
 import re
 from difflib import SequenceMatcher
 
-try:  # optional dependency for better PDF parsing
-    from PyPDF2 import PdfReader
-    _HAS_PYPDF = True
-except Exception:  # pragma: no cover - optional dependency
-    _HAS_PYPDF = False
+from .pdf_utils import extract_text
 
 def extract_invoice_data_from_pdf(pdf_file_path):
     """Parse a PDF invoice and return basic invoice data.
@@ -30,16 +26,7 @@ def extract_invoice_data_from_pdf(pdf_file_path):
     """
 
     try:
-        if _HAS_PYPDF:
-            reader = PdfReader(pdf_file_path)
-            text = "\n".join(page.extract_text() or "" for page in reader.pages)
-        else:
-            with open(pdf_file_path, "rb") as fh:
-                data = fh.read()
-            try:
-                text = data.decode("utf-8")
-            except UnicodeDecodeError:
-                text = data.decode("latin1", errors="ignore")
+        text = extract_text(pdf_file_path, ocr=True)
     except Exception as exc:  # pragma: no cover - I/O failures
         raise ValueError(f"Failed to read PDF '{pdf_file_path}': {exc}") from exc
 
